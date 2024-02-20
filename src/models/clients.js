@@ -126,7 +126,7 @@ const getClient = async ({ data }) => {
         }
       }
     }else if(type_supervisor == "ADM"){
-      let sql = `SELECT id_client , fullname , email , phone , direction FROM clients WHERE id_supervisor = ? ;`
+      let sql = `SELECT id_client , fullname , email , phone , direction , address , state , sector , activation_status FROM clients WHERE id_supervisor = ? ;`
       let [admin] = await connection.execute(sql,[id_supervisor])
 
       if (admin.length > 0) {
