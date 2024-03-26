@@ -62,8 +62,8 @@ const regClient = async ({clients}) => {
     const fechaActual = new Date()
     const date_created = fechaActual.toISOString().split('T')[0]
 
-    let sql = `INSERT INTO clients ( id_supervisor , type_supervisor , fullname , address , email , phone , state , sector , direction , date_created , activation_status ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
-    const [result] = await connection.execute(sql, [id_supervisor , type_supervisor , fullname , address , email, phone, state , sector, direction, date_created, 1 ])
+    let sql = `INSERT INTO clients ( id_supervisor , type_supervisor , fullname , address , phone , country , state , sector , direction , date_created , activation_status ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
+    const [result] = await connection.execute(sql, [id_supervisor , type_supervisor , fullname , address , phone, country, state , sector, direction, date_created, 1 ])
 
     if (result.affectedRows > 0) {
       msg = {
@@ -109,7 +109,7 @@ const getClient = async ({ data }) => {
       console.log(idBoss)
 
       let sqlAdmin = `
-        SELECT id_client, fullname, email, phone, direction, address, state, sector, activation_status
+        SELECT id_client, fullname, phone, direction, address, country, state, sector, activation_status
         FROM clients
         WHERE id_supervisor = ? AND type_supervisor = "ADM";
       `;
@@ -117,7 +117,7 @@ const getClient = async ({ data }) => {
 
       // Obtener clientes creados por ti (VED)
       let sqlSeller = `
-      SELECT id_client, fullname, email, phone, direction, address, state, sector, activation_status
+      SELECT id_client, fullname, phone, direction, address, country, state, sector, activation_status
       FROM clients
       WHERE id_supervisor = ? AND type_supervisor = "VED" ;
       `
@@ -139,7 +139,7 @@ const getClient = async ({ data }) => {
       
       // Obtener clientes creados por ti (ADM)
       let sqlAdmin = `
-        SELECT id_client, fullname, email, phone, direction, address, state, sector, activation_status
+        SELECT id_client, fullname, phone, direction, address, country, state, sector, activation_status
         FROM clients
         WHERE id_supervisor = ? AND type_supervisor = "ADM";
       `;
@@ -148,7 +148,7 @@ const getClient = async ({ data }) => {
       // Obtener clientes creados por tus vendedores y excluir los clientes ya obtenidos en la primera consulta
       let sqlSeller = `
         SELECT
-        clients.id_client, clients.fullname, clients.email, clients.phone, clients.direction, clients.address, clients.state, clients.sector, clients.activation_status
+        clients.id_client, clients.fullname, clients.phone, clients.direction, clients.address, clients.country, clients.state, clients.sector, clients.activation_status
         FROM clients
         INNER JOIN sellers ON clients.id_supervisor = sellers.id_seller 
         WHERE sellers.id_boss = ? AND clients.id_client NOT IN (${clientsAdmin.map(client => client.id_client).join(',')});
@@ -198,7 +198,7 @@ const editClient = async ({clients}) => {
     const [verify] = await connection.execute(`SELECT id_client FROM clients WHERE id_client = ?;`, [id_client])
 
     if (verify.length > 0) {
-      const [result] = await connection.execute(`UPDATE clients SET fullname = ?, address = ?, email = ?, phone = ?, direction = ?, state = ? , sector = ? WHERE id_client = ?;`, [fullname, address, email, phone, direction, state , sector, id_client])
+      const [result] = await connection.execute(`UPDATE clients SET fullname = ?, address = ?, phone = ?, direction = ?, state = ? , country = ? , sector = ? WHERE id_client = ?;`, [fullname, address, phone, direction, state ,  country, sector, id_client])
 
       if (result.affectedRows > 0) {
         msg = {

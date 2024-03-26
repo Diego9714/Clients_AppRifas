@@ -5,15 +5,17 @@ const controller = {}
 // ----- Save Client -----
 controller.regClient = async (req, res) => {
   try {
-    const clients = {id_supervisor,type_supervisor,fullname,address,email,phone,direction,state,sector} = req.body
-
+    const clients = {id_supervisor,type_supervisor,fullname,address,email,phone,direction,country,state,sector} = req.body
+    console.log(clients)
     const filterClient = Object.keys(clients)
 
     if (filterClient.length > 0) {
       const verify = await Clients.verifyClient(clients)
+      console.log(verify)
 
       if(verify.code == 200){
-        const processReg = await Clients.regClient(clients) 
+        const processReg = await Clients.regClient(clients)
+        console.log(processReg)
         
         return res.status(processReg.code).json(processReg)        
       }else{
